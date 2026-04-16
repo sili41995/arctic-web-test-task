@@ -1,11 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { IsEmail, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsOptional, IsString, Min, IsNotEmpty, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateLeadDto {
   @ApiProperty({ example: 'John Doe' })
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiPropertyOptional({ example: 'john@example.com' })
@@ -39,10 +40,12 @@ export class UpdateLeadDto {
   @ApiPropertyOptional({ example: 'John Doe' })
   @IsString()
   @IsOptional()
+  @IsNotEmpty()
   name?: string;
 
   @ApiPropertyOptional({ example: 'john@example.com' })
   @IsEmail()
+  @IsNotEmpty()
   @IsOptional()
   email?: string;
 
@@ -68,6 +71,11 @@ export class UpdateLeadDto {
   notes?: string;
 }
 
+export enum LeadSortField {
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+}
+
 export class LeadQueryDto {
   @ApiPropertyOptional({ example: 1, default: 1 })
   @IsNumber()
@@ -86,10 +94,22 @@ export class LeadQueryDto {
   @ApiPropertyOptional({ example: 'John' })
   @IsString()
   @IsOptional()
-  search?: string;
+  q?: string;
 
   @ApiPropertyOptional({ enum: Status })
   @IsEnum(Status)
   @IsOptional()
   status?: Status;
+
+  @ApiPropertyOptional({ example: 'createdAt', enum: LeadSortField })
+  @IsEnum(LeadSortField)
+  @IsOptional()
+  sort?: LeadSortField = LeadSortField.CREATED_AT;
+
+  @ApiPropertyOptional({ example: 'desc', enum: ['asc', 'desc'] })
+  @IsString()
+  @IsIn(['asc', 'desc'])
+  @IsOptional()
+  order?: 'asc' | 'desc' = 'desc';
 }
+

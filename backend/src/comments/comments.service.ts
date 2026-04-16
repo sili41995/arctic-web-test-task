@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateCommentDto } from './dto/comment.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CommentsService {
@@ -38,7 +39,14 @@ export class CommentsService {
         where: { id },
       });
     } catch (error) {
-      throw new NotFoundException(`Comment with ID ${id} not found`);
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Comment with ID ${id} not found`);
+      }
+      throw error;
     }
   }
 }
+

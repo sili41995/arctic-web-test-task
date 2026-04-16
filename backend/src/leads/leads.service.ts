@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateLeadDto, UpdateLeadDto, LeadQueryDto } from './dto/lead.dto';
+import { CreateLeadDto, UpdateLeadDto, LeadQueryDto, LeadSortField } from './dto/lead.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class LeadsService {
@@ -13,18 +14,25 @@ export class LeadsService {
   }
 
   async findAll(query: LeadQueryDto) {
-    const { page = 1, limit = 10, search, status } = query;
+    const {
+      page = 1,
+      limit = 10,
+      q,
+      status,
+      sort = LeadSortField.CREATED_AT,
+      order = 'desc',
+    } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
     if (status) {
       where.status = status;
     }
-    if (search) {
+    if (q) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { company: { contains: search, mode: 'insensitive' } },
+        { name: { contains: q, mode: 'insensitive' } },
+        { email: { contains: q, mode: 'insensitive' } },
+        { company: { contains: q, mode: 'insensitive' } },
       ];
     }
 
@@ -33,7 +41,7 @@ export class LeadsService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sort]: order },
         include: { _count: { select: { comments: true } } },
       }),
       this.prisma.lead.count({ where }),
@@ -74,7 +82,13 @@ export class LeadsService {
         data: updateLeadDto,
       });
     } catch (error) {
-      throw new NotFoundException(`Lead with ID ${id} not found`);
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Lead with ID ${id} not found`);
+      }
+      throw error;
     }
   }
 
@@ -84,7 +98,14 @@ export class LeadsService {
         where: { id },
       });
     } catch (error) {
-      throw new NotFoundException(`Lead with ID ${id} not found`);
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Lead with ID ${id} not found`);
+      }
+      throw error;
     }
   }
 }
+
