@@ -2,6 +2,11 @@
 
 This is a small service (mini-CRM) for managing leads with comments, search, filtering, and pagination.
 
+## Demo Links
+- **Demo URL (web):** [https://arctic-web-test-task.vercel.app](https://arctic-web-test-task.vercel.app)
+- **Demo URL (api):** [https://arctic-backend-qdwz.onrender.com](https://arctic-backend-qdwz.onrender.com)
+- **Swagger URL:** [https://arctic-backend-qdwz.onrender.com/api/docs](https://arctic-backend-qdwz.onrender.com/api/docs)
+
 ## Tech Stack
 - **Backend:** NestJS, Prisma ORM, PostgreSQL, Swagger
 - **Frontend:** Next.js (App Router), TypeScript, TailwindCSS
@@ -65,7 +70,7 @@ Main endpoints:
 3. **Add Comment:** `POST /api/leads/:id/comments` (Body: `{ "text": "Some note" }`)
 4. **List Comments:** `GET /api/leads/:id/comments`
 
-Full documentation is available at: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+Full documentation is available at: [http://localhost:3000/api/docs](http://localhost:3000/api/docs) (Live: [Demo Swagger](https://arctic-backend-qdwz.onrender.com/api/docs))
 
 ---
 
