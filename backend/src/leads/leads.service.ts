@@ -24,7 +24,7 @@ export class LeadsService {
     } = query;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.LeadWhereInput = {};
     if (status) {
       where.status = status;
     }
